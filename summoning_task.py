@@ -1,7 +1,13 @@
 from numpy import linalg as la
+from graphviz import Digraph
+import tempfile
+import os
 
-#Represent a protocol as a directed graph
-class Protocol:  
+os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz/bin'
+
+
+#Represent a summoning task as a directed graph
+class SummoningTask:
     def __init__(self, rels):
         self.diamonds = list()
         self.connections = list()
@@ -58,7 +64,7 @@ class Protocol:
                         d, di, dj = di2, di1, dj1
                     else:
                         compare = False
-                    if compare:                        
+                    if compare:
                         if self.__agree(infoi, infoj):
                             self.violation[d] = (di, dj)
         self.violates = bool(self.violation)
@@ -88,7 +94,7 @@ class Protocol:
                     di.setCall(False)
                     dj.setCall(False)
 
-    def printProtocol(self):
+    def printTask(self):
         if bool(self.diamonds):
             print("Diamonds: ", end = "")
             for diam in self.diamonds:
@@ -126,7 +132,7 @@ class Protocol:
                 for val in eigvect:
                     print("%.2f"%val + " ", end = "")
                 print()
-            
+
     def printViolation(self):
         if self.violates is None:
             self.violatesMonogomy()
@@ -152,7 +158,24 @@ class Protocol:
                     else:
                         print("0 ", end = "")
                 print()
-    
+
+    def showGraph(self):
+        print('Outputting graph...')
+        
+        g = Digraph(
+            format='jpg',
+            name='Graph',
+            graph_attr={'regular': 'true', 'layout':'circo'},
+            node_attr={'shape': 'circle', 'fixedsize': 'shape', 'width':'0.35', 'height':'0.35'},
+            edge_attr={}
+        )
+
+        for diamond in self.diamonds:
+            g.node(diamond.getLabel())
+        for connection in self.connections:
+            g.edge(connection[0].getLabel(), connection[1].getLabel())
+        g.view(tempfile.mktemp(''))
+
 
 #Represent a diamond as a vertex
 class Diamond:
@@ -161,7 +184,7 @@ class Diamond:
         self.preSet = list()
         self.postSet = list()
         self.call = False
-        
+
     def __eq__(self, other):
         return self.label == other.label
 
@@ -178,7 +201,7 @@ class Diamond:
     def addPost(self, post):
         if isinstance(post, Diamond):
             self.postSet += [post]
-                
+
     def connectsTo(self, other):
         return other in postSet
 

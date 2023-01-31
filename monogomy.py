@@ -1,10 +1,12 @@
-from protocol import Protocol, Diamond
+from summoning_task import *
 
-while(True):
-    p = input("Enter a protocol by specifying its causal connections: ")
-    protocol = Protocol(eval("{" + p + "}"))
-    protocol.printProtocol()
-    protocol.printCausalMatrix()
-    protocol.printEntanglements()
-    protocol.printViolation()
+
+while True:
+    inText = eval('[' + input('Input graph. Example (1,2),(3): ') + ']')
+    if inText == []:
+        break
+    
+    task = SummoningTask(inText)
+    task.printViolation()
+    task.showGraph()
     print()
